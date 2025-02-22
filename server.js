@@ -2,14 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
-const { Pool } = require("./db");
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+const db = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -30,7 +23,7 @@ app.use(express.json());
 // Get all budget items
 app.get("/api/budget-items", async (req, res) => {
   try {
-    const result = await pool.query(`SELECT * FROM budget_items ORDER BY id`);
+    const result = await db.query(`SELECT * FROM budget_items ORDER BY id`);
 
     const formattedData = result.rows.map(item => ({
       ...item,
@@ -47,7 +40,7 @@ app.get("/api/budget-items", async (req, res) => {
 app.get("/api/budget-items/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT *
       FROM budget_items
       WHERE id = $1`,
@@ -68,7 +61,7 @@ app.get("/api/budget-items/:id", async (req, res) => {
 app.post("/api/budget-items", async (req, res) => {
   try {
     const { name, cost, freq, startDate } = req.body;
-    const result = await pool.query(`
+    const result = await db.query(`
       INSERT INTO budget_items (name, cost, freq, start_date)
       VALUES ($1, $2, $3, $4)
       RETURNING *`,
@@ -84,7 +77,7 @@ app.post("/api/budget-items", async (req, res) => {
 app.delete("/api/budget-items/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    await pool.query(`DELETE FROM budget_items WHERE id = $1`, [id]);
+    await db.query(`DELETE FROM budget_items WHERE id = $1`, [id]);
 
     res.json({ message: `ID: ${id} - Budget item deleted` });
   } catch (err) {
@@ -98,7 +91,7 @@ app.delete("/api/budget-items/:id", async (req, res) => {
 // Get all debt items
 app.get("/api/debt-items", async (req, res) => {
   try {
-    const result = await pool.query(`SELECT * FROM debt_items ORDER BY id`);
+    const result = await db.query(`SELECT * FROM debt_items ORDER BY id`);
 
     const formattedData = result.rows.map(item => ({
       ...item,
@@ -115,7 +108,7 @@ app.get("/api/debt-items", async (req, res) => {
 app.post("/api/debt-items", async (req, res) => {
   try {
     const { name, amount } = req.body;
-    const result = await pool.query(`
+    const result = await db.query(`
       INSERT INTO debt_items (name, amount)
       VALUES ($1, $2)
       RETURNING *`,
@@ -132,7 +125,7 @@ app.put("/api/debt-items/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     const { name, amount } = req.body;
-    const result = await pool.query(`
+    const result = await db.query(`
       UPDATE debt_items
       SET name = $1, amount = $2
       WHERE id = $3
@@ -149,7 +142,7 @@ app.put("/api/debt-items/:id", async (req, res) => {
 app.delete("/api/debt-items/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    await pool.query("DELETE FROM debt_items WHERE id = $1", [id]);
+    await db.query("DELETE FROM debt_items WHERE id = $1", [id]);
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -162,7 +155,7 @@ app.delete("/api/debt-items/:id", async (req, res) => {
 // Get monthly income
 app.get("/api/app-settings", async (req, res) => {
   try {
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT monthly_income FROM app_settings
     `);
 
@@ -180,7 +173,7 @@ app.get("/api/app-settings", async (req, res) => {
 app.put("/api/app-settings", async (req, res) => {
   try {
     const { monthlyIncome } = req.body;
-    const result = await pool.query(`
+    const result = await db.query(`
       UPDATE app_settings
       SET monthly_income = $1
       WHERE id = 1
