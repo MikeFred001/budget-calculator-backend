@@ -11,7 +11,7 @@ app.use(
   cors({
     origin: [
       "https://girl-math-monthly.vercel.app",
-      "https://girl-math-monthly-btgp5gwp6-michael-fredericksons-projects.vercel.app/",
+      "https://girl-math-monthly-5mp5i0z8j-michael-fredericksons-projects.vercel.app/",
       "http://localhost:3000"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
