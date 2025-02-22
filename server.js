@@ -9,7 +9,10 @@ const PORT = process.env.PORT || 8080;
 
 app.use(
   cors({
-    origin: ["https://girl-math-monthly.vercel.app"],
+    origin: [
+      "https://girl-math-monthly.vercel.app",
+      "https://girl-math-monthly-btgp5gwp6-michael-fredericksons-projects.vercel.app/"
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type"],
   })
