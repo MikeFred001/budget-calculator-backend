@@ -7,7 +7,13 @@ const pool = require("./db");
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://girl-math-monthly.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
 app.use(express.json());
 
 
